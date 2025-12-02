@@ -504,8 +504,8 @@ services:
       - netbird
       - traefik_traefik
     volumes:
-      - netbird_management:/var/lib/netbird
-      - ./management.json:/etc/netbird/management.json
+      - /mnt/user/DockerData/netbird/management:/var/lib/netbird
+      - /mnt/user/DockerData/netbird/management/management.json:/etc/netbird/management.json
     command: [
       "--port", "80",
       "--log-file", "console",
@@ -575,7 +575,7 @@ services:
         condition: 'service_healthy'
     volumes:
       - ./machinekey:/machinekey
-      - netbird_zitadel_certs:/zdb-certs:ro
+      - /mnt/user/DockerData/netbird/zdb/certs:/zdb-certs:ro
     networks: 
       - netbird
       - traefik_traefik
@@ -675,7 +675,7 @@ services:
     env_file:
       - ./zdb.env
     volumes:
-      - netbird_zdb_data:/var/lib/postgresql/data:rw
+      - /mnt/user/DockerData/netbird/zdb/data:/var/lib/postgresql/data:rw
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
       interval: 5s
