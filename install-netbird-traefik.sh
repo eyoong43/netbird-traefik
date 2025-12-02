@@ -3,7 +3,7 @@
 set -e
 
 # Configuration
-TRAEFIK_NETWORK="traefik_traefik"
+TRAEFIK_NETWORK="proxy"
 TRAEFIK_CERTRESOLVER="webssl"
 NETBIRD_DOMAIN="netbird.yblis.fr"
 
@@ -422,12 +422,12 @@ services:
     restart: unless-stopped
     networks: 
       - netbird
-      - traefik_traefik
+      - proxy
     env_file:
       - ./dashboard.env
     labels:
       - traefik.enable=true
-      - traefik.docker.network=traefik_traefik
+      - traefik.docker.network=proxy
       - traefik.http.services.netbird-dashboard.loadbalancer.server.port=80
       - traefik.http.routers.netbird-dashboard.rule=Host(`NETBIRD_DOMAIN_PLACEHOLDER`)
       - traefik.http.routers.netbird-dashboard.entrypoints=https
@@ -446,10 +446,10 @@ services:
     restart: unless-stopped
     networks: 
       - netbird
-      - traefik_traefik
+      - proxy
     labels:
       - traefik.enable=true
-      - traefik.docker.network=traefik_traefik
+      - traefik.docker.network=proxy
       - traefik.http.services.netbird-signal.loadbalancer.server.port=10000
       - traefik.http.services.netbird-signal.loadbalancer.server.scheme=h2c
       - traefik.http.routers.netbird-signal.rule=Host(`NETBIRD_DOMAIN_PLACEHOLDER`) && PathPrefix(`/signalexchange.SignalExchange/`)
@@ -478,12 +478,12 @@ services:
     restart: unless-stopped
     networks: 
       - netbird
-      - traefik_traefik
+      - proxy
     env_file:
       - ./relay.env
     labels:
       - traefik.enable=true
-      - traefik.docker.network=traefik_traefik
+      - traefik.docker.network=proxy
       - traefik.http.services.netbird-relay.loadbalancer.server.port=33080
       - traefik.http.routers.netbird-relay.rule=Host(`NETBIRD_DOMAIN_PLACEHOLDER`) && PathPrefix(`/relay`)
       - traefik.http.routers.netbird-relay.entrypoints=https
@@ -502,7 +502,7 @@ services:
     restart: unless-stopped
     networks: 
       - netbird
-      - traefik_traefik
+      - proxy
     volumes:
       - /mnt/user/DockerData/netbird/management:/var/lib/netbird
       - /mnt/user/DockerData/netbird/management/management.json:/etc/netbird/management.json
@@ -517,7 +517,7 @@ services:
     ]
     labels:
       - traefik.enable=true
-      - traefik.docker.network=traefik_traefik
+      - traefik.docker.network=proxy
       - traefik.http.services.netbird-management.loadbalancer.server.port=80
       - traefik.http.services.netbird-management-grpc.loadbalancer.server.port=80
       - traefik.http.services.netbird-management-grpc.loadbalancer.server.scheme=h2c
@@ -574,14 +574,14 @@ services:
       zdb:
         condition: 'service_healthy'
     volumes:
-      - ./machinekey:/machinekey
+      - /mnt/user/DockerData/netbird/zitadel/machinekey:/machinekey
       - /mnt/user/DockerData/netbird/zdb/certs:/zdb-certs:ro
     networks: 
       - netbird
-      - traefik_traefik
+      - proxy
     labels:
       - traefik.enable=true
-      - traefik.docker.network=traefik_traefik
+      - traefik.docker.network=proxy
       - traefik.http.services.zitadel.loadbalancer.server.port=8080
       - traefik.http.services.zitadel.loadbalancer.server.scheme=h2c
       # OIDC wellknown
@@ -696,8 +696,9 @@ volumes:
 networks:
   netbird:
     driver: bridge
-  traefik_traefik:
+  proxy:
     external: true
+    name: proxy
 EOF
 sed -i "s/NETBIRD_DOMAIN_PLACEHOLDER/${NETBIRD_DOMAIN}/g; s/NETBIRD_TRAEFIK_SSL/${TRAEFIK_CERTRESOLVER}/g" docker-compose.yml
 
