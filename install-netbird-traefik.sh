@@ -687,14 +687,9 @@ services:
       options:
         max-size: "500m"
         max-file: "2"
-
-volumes:
-  netbird_zdb_data:
-  netbird_management:
-  netbird_zitadel_certs:
-
 networks:
   netbird:
+    name: netbird
     driver: bridge
   proxy:
     external: true
