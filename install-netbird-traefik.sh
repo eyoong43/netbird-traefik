@@ -722,7 +722,7 @@ sed -i "s/NETBIRD_DOMAIN_PLACEHOLDER/${NETBIRD_DOMAIN}/g; s/NETBIRD_TRAEFIK_SSL/
   echo "Configuring Zitadel applications..."
 
   INSTANCE_URL="https://$NETBIRD_DOMAIN"
-  TOKEN_PATH=./machinekey/zitadel-admin-sa.token
+  TOKEN_PATH=/mnt/user/DockerData/netbird/zitadel/machinekey/zitadel-admin-sa.token
 
   echo -n "Waiting for Zitadel's PAT to be created "
   wait_pat "$TOKEN_PATH"
